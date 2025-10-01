@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding RSVP - Iman & Jannah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        @keyframes confetti {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            z-index: 1000;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .clean-bg {
+            background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+        }
+        
+        .elegant-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .divider {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #d1d5db, transparent);
+            margin: 0 auto;
+        }
+        
+        .input-focus:focus {
+            outline: none;
+            border-color: #6b7280;
+            box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.7;
+            transform: none;
+            cursor: not-allowed;
+        }
+        
+        .form-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .calendar-btn {
+            border: 1px solid #d1d5db;
+            color: #374151;
+            transition: all 0.3s ease;
+        }
+        
+        .calendar-btn:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="clean-bg min-h-screen py-12 px-4">
+    <div class="max-w-lg mx-auto relative z-10">
+        <!-- Header -->
+        <div class="text-center mb-12 fade-in-up">
+            <h1 class="text-5xl md:text-6xl font-serif font-light text-gray-800 mb-4 tracking-wide">Iman & Jannah</h1>
+            <div class="divider mb-6"></div>
+            <p class="text-xl text-gray-700 font-light mb-2">30 November 2025</p>
+            <p class="text-base text-gray-600 mb-1">10:00 AM - 3:00 PM</p>
+            <p class="text-base text-gray-600">Quill City Mall, Jalan Sultan Ismail</p>
+        </div>
+
+        <!-- RSVP Form -->
+        <div id="rsvp-form" class="form-card rounded-lg p-8 elegant-shadow fade-in-up">
+            <h2 class="text-2xl font-serif font-light text-gray-800 text-center mb-8">Kindly Respond</h2>
+            
+            <form id="rsvpForm" class="space-y-8">
+                <!-- Guest Name -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-3 tracking-wide">Full Name</label>
+                    <input type="text" id="guestName" required 
+                           class="w-full px-0 py-3 border-0 border-b border-gray-200 bg-transparent input-focus text-gray-800 placeholder-gray-400 transition-all"
+                           placeholder="Enter your full name">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-3 tracking-wide">Email Address</label>
+                    <input type="email" id="email" required 
+                           class="w-full px-0 py-3 border-0 border-b border-gray-200 bg-transparent input-focus text-gray-800 placeholder-gray-400 transition-all"
+                           placeholder="your.email@example.com">
+                </div>
+
+                <!-- Attendance -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-4 tracking-wide">Will you be attending?</label>
+                    <div class="space-y-3">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="attendance" value="yes" required class="mr-4 text-gray-600 focus:ring-gray-500">
+                            <span class="text-gray-700 group-hover:text-gray-900 transition-colors">Yes, I will attend</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="attendance" value="no" required class="mr-4 text-gray-600 focus:ring-gray-500">
+                            <span class="text-gray-700 group-hover:text-gray-900 transition-colors">Unable to attend</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Plus Ones -->
+                <div id="plusOneSection" class="hidden">
+                    <label class="block text-sm font-medium text-gray-600 mb-3 tracking-wide">Number of Guests</label>
+                    <select id="plusOnes" class="w-full px-0 py-3 border-0 border-b border-gray-200 bg-transparent input-focus text-gray-800 transition-all">
+                        <option value="0">Just myself</option>
+                        <option value="1">2 guests total</option>
+                        <option value="2">3 guests total</option>
+                        <option value="3">4 guests total</option>
+                    </select>
+                </div>
+
+                <!-- Plus One Names -->
+                <div id="plusOneNames" class="hidden space-y-4">
+                    <label class="block text-sm font-medium text-gray-600 tracking-wide">Additional Guest Names</label>
+                </div>
+
+                <!-- Message to Couple -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-3 tracking-wide">Message for Iman & Jannah</label>
+                    <textarea id="message" rows="4" 
+                              class="w-full px-0 py-3 border-0 border-b border-gray-200 bg-transparent input-focus text-gray-800 placeholder-gray-400 transition-all resize-none"
+                              placeholder="Share your wishes for the happy couple..."></textarea>
+                </div>
+
+                <!-- Calendar Save Options -->
+                <div id="calendarSection" class="hidden">
+                    <label class="block text-sm font-medium text-gray-600 mb-4 tracking-wide">Save the Date</label>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button type="button" id="saveGoogle" 
+                                class="flex-1 flex items-center justify-center px-4 py-3 calendar-btn rounded-md text-sm">
+                            Google Calendar
+                        </button>
+                        <button type="button" id="saveApple" 
+                                class="flex-1 flex items-center justify-center px-4 py-3 calendar-btn rounded-md text-sm">
+                            Apple Calendar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button type="submit" 
+                            class="w-full btn-primary text-white font-medium py-4 px-6 rounded-md text-sm tracking-wide">
+                        Send Response
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Thank You Message -->
+        <div id="thank-you" class="hidden form-card rounded-lg p-8 elegant-shadow text-center">
+            <div class="mb-6">
+                <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-serif font-light text-gray-800 mb-4">Thank You</h2>
+            <div class="divider mb-6"></div>
+            <p class="text-gray-600 mb-8 leading-relaxed">Your response has been received.<br>We look forward to celebrating with you.</p>
+            <button onclick="showForm()" 
+                    class="btn-primary text-white px-8 py-3 rounded-md text-sm tracking-wide font-medium">
+                Submit Another Response
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Form elements
+        const form = document.getElementById('rsvpForm');
+        const attendanceRadios = document.querySelectorAll('input[name="attendance"]');
+        const plusOneSection = document.getElementById('plusOneSection');
+        const plusOneSelect = document.getElementById('plusOnes');
+        const plusOneNames = document.getElementById('plusOneNames');
+        const calendarSection = document.getElementById('calendarSection');
+        const rsvpForm = document.getElementById('rsvp-form');
+        const thankYou = document.getElementById('thank-you');
+
+        // Show/hide sections based on attendance
+        attendanceRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'yes') {
+                    plusOneSection.classList.remove('hidden');
+                    calendarSection.classList.remove('hidden');
+                } else {
+                    plusOneSection.classList.add('hidden');
+                    calendarSection.classList.add('hidden');
+                    plusOneNames.classList.add('hidden');
+                }
+            });
+        });
+
+        // Handle plus one selection
+        plusOneSelect.addEventListener('change', function() {
+            const count = parseInt(this.value);
+            plusOneNames.innerHTML = '<label class="block text-sm font-medium text-gray-600 tracking-wide">Additional Guest Names</label>';
+            
+            if (count > 0) {
+                plusOneNames.classList.remove('hidden');
+                for (let i = 1; i <= count; i++) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.placeholder = `Guest ${i + 1} name`;
+                    input.className = 'w-full px-0 py-3 border-0 border-b border-gray-200 bg-transparent input-focus text-gray-800 placeholder-gray-400 transition-all mt-2';
+                    plusOneNames.appendChild(input);
+                }
+            } else {
+                plusOneNames.classList.add('hidden');
+            }
+        });
+
+        // Calendar save functions
+        document.getElementById('saveGoogle').addEventListener('click', function() {
+            const startDate = '20251130T100000Z';
+            const endDate = '20251130T150000Z';
+            const title = 'Iman & Jannah\'s Wedding';
+            const location = 'Quill City Mall, Jalan Sultan Ismail';
+            const details = 'Join us for our special day!';
+            
+            const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate}/${endDate}&location=${encodeURIComponent(location)}&details=${encodeURIComponent(details)}`;
+            window.open(googleUrl, '_blank', 'noopener,noreferrer');
+        });
+
+        document.getElementById('saveApple').addEventListener('click', function() {
+            const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Wedding RSVP//EN
+BEGIN:VEVENT
+UID:wedding-iman-jannah-2025@example.com
+DTSTART:20251130T100000Z
+DTEND:20251130T150000Z
+SUMMARY:Iman & Jannah's Wedding
+LOCATION:Quill City Mall, Jalan Sultan Ismail
+DESCRIPTION:Join us for our special day!
+END:VEVENT
+END:VCALENDAR`;
+
+            const blob = new Blob([icsContent], { type: 'text/calendar' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'wedding-iman-jannah.ics';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        });
+
+        // Google Sheets Integration
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxpvyukJxoBJYxsPeSSIMDGXhJeiyiKq_qOGfTLfsPDjbfrcbMGimElno3GG9D7HRTQ/exec';
+
+        async function submitToGoogleSheets(data) {
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                console.log('Data sent to Google Sheets successfully');
+                return true;
+            } catch (error) {
+                console.error('Error sending to Google Sheets:', error);
+                return false;
+            }
+        }
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+            
+            // Collect form data
+            const formData = {
+                name: document.getElementById('guestName').value,
+                email: document.getElementById('email').value,
+                attendance: document.querySelector('input[name="attendance"]:checked').value,
+                plusOnes: document.getElementById('plusOnes').value,
+                message: document.getElementById('message').value,
+                timestamp: new Date().toLocaleString('en-MY', { 
+                    timeZone: 'Asia/Kuala_Lumpur',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+
+            // Collect plus one names
+            const plusOneInputs = plusOneNames.querySelectorAll('input[type="text"]');
+            formData.plusOneNames = Array.from(plusOneInputs).map(input => input.value).filter(name => name.trim()).join(', ');
+
+            // Prepare data for Google Sheets
+            const sheetsData = {
+                Name: formData.name,
+                Email: formData.email,
+                Attendance: formData.attendance === 'yes' ? 'Yes' : 'No',
+                'Number of Guests': parseInt(formData.plusOnes) + 1,
+                'Additional Guests': formData.plusOneNames || 'None',
+                Message: formData.message || 'No message',
+                'Submission Time': formData.timestamp
+            };
+
+            // Submit to Google Sheets
+            submitToGoogleSheets(sheetsData).then(success => {
+                // Also store locally as backup
+                const existingRSVPs = JSON.parse(localStorage.getItem('weddingRSVPs') || '[]');
+                existingRSVPs.push(formData);
+                localStorage.setItem('weddingRSVPs', JSON.stringify(existingRSVPs));
+
+                // Reset button
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+
+                // Show thank you message with confetti
+                rsvpForm.classList.add('hidden');
+                thankYou.classList.remove('hidden');
+                createConfetti();
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                if (success) {
+                    console.log('RSVP successfully saved to Google Sheets');
+                } else {
+                    console.log('RSVP saved locally (Google Sheets connection failed)');
+                }
+            });
+        });
+
+        // Confetti animation
+        function createConfetti() {
+            const colors = ['#d1d5db', '#9ca3af', '#6b7280', '#f3f4f6', '#e5e7eb', '#374151'];
+            
+            for (let i = 0; i < 40; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                    confetti.style.animationDelay = Math.random() * 1 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 6000);
+                }, i * 60);
+            }
+        }
+
+        // Function to show form again
+        function showForm() {
+            thankYou.classList.add('hidden');
+            rsvpForm.classList.remove('hidden');
+            form.reset();
+            plusOneSection.classList.add('hidden');
+            calendarSection.classList.add('hidden');
+            plusOneNames.classList.add('hidden');
+        }
+
+        // Demo function to view stored RSVPs (for testing)
+        function viewStoredRSVPs() {
+            const rsvps = JSON.parse(localStorage.getItem('weddingRSVPs') || '[]');
+            console.log('All stored RSVPs:', rsvps);
+            return rsvps;
+        }
+
+        // Make viewStoredRSVPs available globally for testing
+        window.viewStoredRSVPs = viewStoredRSVPs;
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987c1c79c2bc2925',t:'MTc1OTMyMzI5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
