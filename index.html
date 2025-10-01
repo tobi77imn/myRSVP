@@ -98,6 +98,15 @@
             border-color: #9ca3af;
             transform: translateY(-1px);
         }
+        
+        /* Fix for hidden elements */
+        .hidden {
+            display: none !important;
+        }
+        
+        .show {
+            display: block !important;
+        }
     </style>
 </head>
 <body class="clean-bg min-h-screen py-12 px-4">
@@ -150,7 +159,7 @@
                 <!-- Plus Ones -->
                 <div id="plusOneSection" class="hidden">
                     <label class="block text-sm font-medium text-gray-600 mb-3 tracking-wide">Number of Guests</label>
-                    <select id="plusOnes" class="w-full px-0 py-3 border-0 border-b border-gray-200 bg-transparent input-focus text-gray-800 transition-all">
+                    <select id="plusOnes" class="w-full px-3 py-3 border border-gray-200 rounded-md bg-white input-focus text-gray-800 transition-all">
                         <option value="0">Just myself</option>
                         <option value="1">2 guests total</option>
                         <option value="2">3 guests total</option>
@@ -177,11 +186,11 @@
                     <div class="flex flex-col sm:flex-row gap-3">
                         <button type="button" id="saveGoogle" 
                                 class="flex-1 flex items-center justify-center px-4 py-3 calendar-btn rounded-md text-sm">
-                            Google Calendar
+                            📅 Google Calendar
                         </button>
                         <button type="button" id="saveApple" 
                                 class="flex-1 flex items-center justify-center px-4 py-3 calendar-btn rounded-md text-sm">
-                            Apple Calendar
+                            🍎 Apple Calendar
                         </button>
                     </div>
                 </div>
@@ -214,63 +223,85 @@
     </div>
 
     <script>
-        // Form elements
-        const form = document.getElementById('rsvpForm');
-        const attendanceRadios = document.querySelectorAll('input[name="attendance"]');
-        const plusOneSection = document.getElementById('plusOneSection');
-        const plusOneSelect = document.getElementById('plusOnes');
-        const plusOneNames = document.getElementById('plusOneNames');
-        const calendarSection = document.getElementById('calendarSection');
-        const rsvpForm = document.getElementById('rsvp-form');
-        const thankYou = document.getElementById('thank-you');
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing form...');
+            
+            // Form elements
+            const form = document.getElementById('rsvpForm');
+            const attendanceRadios = document.querySelectorAll('input[name="attendance"]');
+            const plusOneSection = document.getElementById('plusOneSection');
+            const plusOneSelect = document.getElementById('plusOnes');
+            const plusOneNames = document.getElementById('plusOneNames');
+            const calendarSection = document.getElementById('calendarSection');
+            const rsvpForm = document.getElementById('rsvp-form');
+            const thankYou = document.getElementById('thank-you');
 
-        // Show/hide sections based on attendance
-        attendanceRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                if (this.value === 'yes') {
-                    plusOneSection.classList.remove('hidden');
-                    calendarSection.classList.remove('hidden');
+            console.log('Found elements:', {
+                form: !!form,
+                attendanceRadios: attendanceRadios.length,
+                plusOneSection: !!plusOneSection,
+                calendarSection: !!calendarSection
+            });
+
+            // Show/hide sections based on attendance
+            attendanceRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    console.log('Attendance changed to:', this.value);
+                    if (this.value === 'yes') {
+                        plusOneSection.classList.remove('hidden');
+                        plusOneSection.classList.add('show');
+                        calendarSection.classList.remove('hidden');
+                        calendarSection.classList.add('show');
+                        console.log('Showing plus one and calendar sections');
+                    } else {
+                        plusOneSection.classList.add('hidden');
+                        plusOneSection.classList.remove('show');
+                        calendarSection.classList.add('hidden');
+                        calendarSection.classList.remove('show');
+                        plusOneNames.classList.add('hidden');
+                        plusOneNames.classList.remove('show');
+                        console.log('Hiding sections');
+                    }
+                });
+            });
+
+            // Handle plus one selection
+            plusOneSelect.addEventListener('change', function() {
+                const count = parseInt(this.value);
+                console.log('Plus ones changed to:', count);
+                plusOneNames.innerHTML = '<label class="block text-sm font-medium text-gray-600 tracking-wide">Additional Guest Names</label>';
+                
+                if (count > 0) {
+                    plusOneNames.classList.remove('hidden');
+                    plusOneNames.classList.add('show');
+                    for (let i = 1; i <= count; i++) {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.placeholder = `Guest ${i + 1} name`;
+                        input.className = 'w-full px-3 py-3 border border-gray-200 rounded-md bg-white input-focus text-gray-800 placeholder-gray-400 transition-all mt-2';
+                        plusOneNames.appendChild(input);
+                    }
                 } else {
-                    plusOneSection.classList.add('hidden');
-                    calendarSection.classList.add('hidden');
                     plusOneNames.classList.add('hidden');
+                    plusOneNames.classList.remove('show');
                 }
             });
-        });
 
-        // Handle plus one selection
-        plusOneSelect.addEventListener('change', function() {
-            const count = parseInt(this.value);
-            plusOneNames.innerHTML = '<label class="block text-sm font-medium text-gray-600 tracking-wide">Additional Guest Names</label>';
-            
-            if (count > 0) {
-                plusOneNames.classList.remove('hidden');
-                for (let i = 1; i <= count; i++) {
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.placeholder = `Guest ${i + 1} name`;
-                    input.className = 'w-full px-0 py-3 border-0 border-b border-gray-200 bg-transparent input-focus text-gray-800 placeholder-gray-400 transition-all mt-2';
-                    plusOneNames.appendChild(input);
-                }
-            } else {
-                plusOneNames.classList.add('hidden');
-            }
-        });
+            // Calendar save functions
+            document.getElementById('saveGoogle').addEventListener('click', function() {
+                const startDate = '20251130T100000Z';
+                const endDate = '20251130T150000Z';
+                const title = 'Iman & Jannah\'s Wedding';
+                const location = 'Quill City Mall, Jalan Sultan Ismail';
+                const details = 'Join us for our special day!';
+                
+                const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate}/${endDate}&location=${encodeURIComponent(location)}&details=${encodeURIComponent(details)}`;
+                window.open(googleUrl, '_blank', 'noopener,noreferrer');
+            });
 
-        // Calendar save functions
-        document.getElementById('saveGoogle').addEventListener('click', function() {
-            const startDate = '20251130T100000Z';
-            const endDate = '20251130T150000Z';
-            const title = 'Iman & Jannah\'s Wedding';
-            const location = 'Quill City Mall, Jalan Sultan Ismail';
-            const details = 'Join us for our special day!';
-            
-            const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate}/${endDate}&location=${encodeURIComponent(location)}&details=${encodeURIComponent(details)}`;
-            window.open(googleUrl, '_blank', 'noopener,noreferrer');
-        });
-
-        document.getElementById('saveApple').addEventListener('click', function() {
-            const icsContent = `BEGIN:VCALENDAR
+            document.getElementById('saveApple').addEventListener('click', function() {
+                const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Wedding RSVP//EN
 BEGIN:VEVENT
@@ -283,148 +314,146 @@ DESCRIPTION:Join us for our special day!
 END:VEVENT
 END:VCALENDAR`;
 
-            const blob = new Blob([icsContent], { type: 'text/calendar' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'wedding-iman-jannah.ics';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        });
-
-        // Google Sheets Integration
-        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxZsCMEFb1UD3WRBB14F7uTJaT7nvmWVP11qZTGYfDbtc8Qch8d1bI95f8dUUtPhpTs/exec';
-
-        async function submitToGoogleSheets(data) {
-            try {
-                const response = await fetch(GOOGLE_SHEETS_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                console.log('Data sent to Google Sheets successfully');
-                return true;
-            } catch (error) {
-                console.error('Error sending to Google Sheets:', error);
-                return false;
-            }
-        }
-
-        // Form submission
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Show loading state
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Sending...';
-            submitBtn.disabled = true;
-            
-            // Collect form data
-            const formData = {
-                name: document.getElementById('guestName').value,
-                email: document.getElementById('email').value,
-                attendance: document.querySelector('input[name="attendance"]:checked').value,
-                plusOnes: document.getElementById('plusOnes').value,
-                message: document.getElementById('message').value,
-                timestamp: new Date().toLocaleString('en-MY', { 
-                    timeZone: 'Asia/Kuala_Lumpur',
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })
-            };
-
-            // Collect plus one names
-            const plusOneInputs = plusOneNames.querySelectorAll('input[type="text"]');
-            formData.plusOneNames = Array.from(plusOneInputs).map(input => input.value).filter(name => name.trim()).join(', ');
-
-            // Prepare data for Google Sheets
-            const sheetsData = {
-                Name: formData.name,
-                Email: formData.email,
-                Attendance: formData.attendance === 'yes' ? 'Yes' : 'No',
-                'Number of Guests': parseInt(formData.plusOnes) + 1,
-                'Additional Guests': formData.plusOneNames || 'None',
-                Message: formData.message || 'No message',
-                'Submission Time': formData.timestamp
-            };
-
-            // Submit to Google Sheets
-            submitToGoogleSheets(sheetsData).then(success => {
-                // Also store locally as backup
-                const existingRSVPs = JSON.parse(localStorage.getItem('weddingRSVPs') || '[]');
-                existingRSVPs.push(formData);
-                localStorage.setItem('weddingRSVPs', JSON.stringify(existingRSVPs));
-
-                // Reset button
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-
-                // Show thank you message with confetti
-                rsvpForm.classList.add('hidden');
-                thankYou.classList.remove('hidden');
-                createConfetti();
-                
-                // Scroll to top
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                if (success) {
-                    console.log('RSVP successfully saved to Google Sheets');
-                } else {
-                    console.log('RSVP saved locally (Google Sheets connection failed)');
-                }
+                const blob = new Blob([icsContent], { type: 'text/calendar' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'wedding-iman-jannah.ics';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
             });
-        });
 
-        // Confetti animation
-        function createConfetti() {
-            const colors = ['#d1d5db', '#9ca3af', '#6b7280', '#f3f4f6', '#e5e7eb', '#374151'];
-            
-            for (let i = 0; i < 40; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.animationDuration = (Math.random() * 3 + 3) + 's';
-                    confetti.style.animationDelay = Math.random() * 1 + 's';
-                    document.body.appendChild(confetti);
+            // Google Sheets Integration
+            const GOOGLE_SHEETS_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+
+            async function submitToGoogleSheets(data) {
+                try {
+                    const response = await fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
                     
-                    setTimeout(() => {
-                        confetti.remove();
-                    }, 6000);
-                }, i * 60);
+                    console.log('Data sent to Google Sheets successfully');
+                    return true;
+                } catch (error) {
+                    console.error('Error sending to Google Sheets:', error);
+                    return false;
+                }
             }
-        }
 
-        // Function to show form again
-        function showForm() {
-            thankYou.classList.add('hidden');
-            rsvpForm.classList.remove('hidden');
-            form.reset();
-            plusOneSection.classList.add('hidden');
-            calendarSection.classList.add('hidden');
-            plusOneNames.classList.add('hidden');
-        }
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Sending...';
+                submitBtn.disabled = true;
+                
+                // Collect form data
+                const formData = {
+                    name: document.getElementById('guestName').value,
+                    email: document.getElementById('email').value,
+                    attendance: document.querySelector('input[name="attendance"]:checked').value,
+                    plusOnes: document.getElementById('plusOnes').value,
+                    message: document.getElementById('message').value,
+                    timestamp: new Date().toLocaleString('en-MY', { 
+                        timeZone: 'Asia/Kuala_Lumpur',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                };
 
-        // Demo function to view stored RSVPs (for testing)
-        function viewStoredRSVPs() {
-            const rsvps = JSON.parse(localStorage.getItem('weddingRSVPs') || '[]');
-            console.log('All stored RSVPs:', rsvps);
-            return rsvps;
-        }
+                // Collect plus one names
+                const plusOneInputs = plusOneNames.querySelectorAll('input[type="text"]');
+                formData.plusOneNames = Array.from(plusOneInputs).map(input => input.value).filter(name => name.trim()).join(', ');
 
-        // Make viewStoredRSVPs available globally for testing
-        window.viewStoredRSVPs = viewStoredRSVPs;
+                // Prepare data for Google Sheets
+                const sheetsData = {
+                    Name: formData.name,
+                    Email: formData.email,
+                    Attendance: formData.attendance === 'yes' ? 'Yes' : 'No',
+                    'Number of Guests': parseInt(formData.plusOnes) + 1,
+                    'Additional Guests': formData.plusOneNames || 'None',
+                    Message: formData.message || 'No message',
+                    'Submission Time': formData.timestamp
+                };
+
+                // Submit to Google Sheets
+                submitToGoogleSheets(sheetsData).then(success => {
+                    // Also store locally as backup
+                    const existingRSVPs = JSON.parse(localStorage.getItem('weddingRSVPs') || '[]');
+                    existingRSVPs.push(formData);
+                    localStorage.setItem('weddingRSVPs', JSON.stringify(existingRSVPs));
+
+                    // Reset button
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+
+                    // Show thank you message with confetti
+                    rsvpForm.classList.add('hidden');
+                    thankYou.classList.remove('hidden');
+                    createConfetti();
+                    
+                    // Scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                    if (success) {
+                        console.log('RSVP successfully saved to Google Sheets');
+                    } else {
+                        console.log('RSVP saved locally (Google Sheets connection failed)');
+                    }
+                });
+            });
+
+            // Confetti animation
+            function createConfetti() {
+                const colors = ['#d1d5db', '#9ca3af', '#6b7280', '#f3f4f6', '#e5e7eb', '#374151'];
+                
+                for (let i = 0; i < 40; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.className = 'confetti';
+                        confetti.style.left = Math.random() * 100 + 'vw';
+                        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                        confetti.style.animationDelay = Math.random() * 1 + 's';
+                        document.body.appendChild(confetti);
+                        
+                        setTimeout(() => {
+                            confetti.remove();
+                        }, 6000);
+                    }, i * 60);
+                }
+            }
+
+            // Function to show form again
+            window.showForm = function() {
+                thankYou.classList.add('hidden');
+                rsvpForm.classList.remove('hidden');
+                form.reset();
+                plusOneSection.classList.add('hidden');
+                calendarSection.classList.add('hidden');
+                plusOneNames.classList.add('hidden');
+            }
+
+            // Demo function to view stored RSVPs (for testing)
+            window.viewStoredRSVPs = function() {
+                const rsvps = JSON.parse(localStorage.getItem('weddingRSVPs') || '[]');
+                console.log('All stored RSVPs:', rsvps);
+                return rsvps;
+            }
+        });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987c1c79c2bc2925',t:'MTc1OTMyMzI5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987c612100d36112',t:'MTc1OTMyNjEwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
