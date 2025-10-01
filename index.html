@@ -160,16 +160,17 @@
                 <div id="plusOneSection" class="hidden">
                     <label class="block text-sm font-medium text-gray-600 mb-3 tracking-wide">Number of Guests</label>
                     <select id="plusOnes" class="w-full px-3 py-3 border border-gray-200 rounded-md bg-white input-focus text-gray-800 transition-all">
-                        <option value="0">Just myself</option>
-                        <option value="1">2 guests total</option>
-                        <option value="2">3 guests total</option>
-                        <option value="3">4 guests total</option>
+                        <option value="1">1 guest</option>
+                        <option value="2">2 guests</option>
+                        <option value="3">3 guests</option>
+                        <option value="4">4 guests</option>
+                        <option value="5">5 guests</option>
+                        <option value="6">6 guests</option>
+                        <option value="7">7 guests</option>
+                        <option value="8">8 guests</option>
+                        <option value="9">9 guests</option>
+                        <option value="10">10 guests</option>
                     </select>
-                </div>
-
-                <!-- Plus One Names -->
-                <div id="plusOneNames" class="hidden space-y-4">
-                    <label class="block text-sm font-medium text-gray-600 tracking-wide">Additional Guest Names</label>
                 </div>
 
                 <!-- Message to Couple -->
@@ -266,26 +267,10 @@
                 });
             });
 
-            // Handle plus one selection
+            // Handle plus one selection (no names required)
             plusOneSelect.addEventListener('change', function() {
                 const count = parseInt(this.value);
-                console.log('Plus ones changed to:', count);
-                plusOneNames.innerHTML = '<label class="block text-sm font-medium text-gray-600 tracking-wide">Additional Guest Names</label>';
-                
-                if (count > 0) {
-                    plusOneNames.classList.remove('hidden');
-                    plusOneNames.classList.add('show');
-                    for (let i = 1; i <= count; i++) {
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.placeholder = `Guest ${i + 1} name`;
-                        input.className = 'w-full px-3 py-3 border border-gray-200 rounded-md bg-white input-focus text-gray-800 placeholder-gray-400 transition-all mt-2';
-                        plusOneNames.appendChild(input);
-                    }
-                } else {
-                    plusOneNames.classList.add('hidden');
-                    plusOneNames.classList.remove('show');
-                }
+                console.log('Guest count changed to:', count);
             });
 
             // Calendar save functions
@@ -374,17 +359,12 @@ END:VCALENDAR`;
                     })
                 };
 
-                // Collect plus one names
-                const plusOneInputs = plusOneNames.querySelectorAll('input[type="text"]');
-                formData.plusOneNames = Array.from(plusOneInputs).map(input => input.value).filter(name => name.trim()).join(', ');
-
                 // Prepare data for Google Sheets
                 const sheetsData = {
                     Name: formData.name,
                     Email: formData.email,
                     Attendance: formData.attendance === 'yes' ? 'Yes' : 'No',
-                    'Number of Guests': parseInt(formData.plusOnes) + 1,
-                    'Additional Guests': formData.plusOneNames || 'None',
+                    'Number of Guests': formData.attendance === 'yes' ? parseInt(formData.plusOnes) : 0,
                     Message: formData.message || 'No message',
                     'Submission Time': formData.timestamp
                 };
@@ -444,7 +424,6 @@ END:VCALENDAR`;
                 form.reset();
                 plusOneSection.classList.add('hidden');
                 calendarSection.classList.add('hidden');
-                plusOneNames.classList.add('hidden');
             }
 
             // Demo function to view stored RSVPs (for testing)
@@ -455,6 +434,5 @@ END:VCALENDAR`;
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987c612100d36112',t:'MTc1OTMyNjEwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987cc2ea0057fda3',t:'MTc1OTMzMDExMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
-
