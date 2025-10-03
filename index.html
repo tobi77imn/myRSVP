@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wedding RSVP - Iman & Jannah</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
         body {
             box-sizing: border-box;
@@ -16,18 +16,41 @@
             font-family: 'Playfair Display', serif;
         }
         
-        @keyframes confetti {
-            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        @keyframes confetti-fall {
+            0% { 
+                transform: translateY(-20px) translateX(0px) rotate(0deg); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(100vh) translateX(var(--random-x)) rotate(720deg); 
+                opacity: 0; 
+            }
         }
         
         .confetti {
             position: fixed;
-            width: 8px;
-            height: 8px;
             z-index: 1000;
             pointer-events: none;
+            animation: confetti-fall linear forwards;
+        }
+        
+        .confetti-rect {
+            width: 10px;
+            height: 6px;
+        }
+        
+        .confetti-circle {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
+        }
+        
+        .confetti-triangle {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 8px solid;
         }
         
         @keyframes fadeInUp {
@@ -113,11 +136,13 @@
     <div class="max-w-lg mx-auto relative z-10">
         <!-- Header -->
         <div class="text-center mb-12 fade-in-up">
-            <h1 class="text-5xl md:text-6xl font-serif font-light text-gray-800 mb-4 tracking-wide">Iman & Jannah</h1>
+            <div class="text-6xl md:text-7xl text-gray-600 mb-4 font-light" style="font-family: 'Great Vibes', cursive; letter-spacing: 2px;">Walimatul Urus</div>
+
+            <h1 class="text-3xl md:text-4xl text-gray-800 mb-4 tracking-widest uppercase" style="font-family: 'Inter', sans-serif; font-weight: 200; letter-spacing: 0.3em;">Iman & Jannah</h1>
             <div class="divider mb-6"></div>
             <p class="text-xl text-gray-700 font-light mb-2">30 November 2025</p>
             <p class="text-base text-gray-600 mb-1">10:00 AM - 3:00 PM</p>
-            <p class="text-base text-gray-600">Magica Banquet 3, Level 3, Quill City Mall, KL</p>
+            <p class="text-base text-gray-600">Quill City Mall, Jalan Sultan Ismail</p>
         </div>
 
         <!-- RSVP Form -->
@@ -342,6 +367,12 @@ END:VCALENDAR`;
                 submitBtn.textContent = 'Sending...';
                 submitBtn.disabled = true;
                 
+                // Debug: Check if phone field exists and has value
+                const phoneField = document.getElementById('phone');
+                console.log('Phone field found:', !!phoneField);
+                console.log('Phone field value:', phoneField ? phoneField.value : 'FIELD NOT FOUND');
+                console.log('Phone field type:', phoneField ? phoneField.type : 'N/A');
+                
                 // Collect form data
                 const formData = {
                     name: document.getElementById('guestName').value,
@@ -359,6 +390,12 @@ END:VCALENDAR`;
                     })
                 };
 
+                console.log('=== DEBUGGING PHONE NUMBER ===');
+                console.log('Raw phone value:', document.getElementById('phone').value);
+                console.log('Form data phone:', formData.phone);
+                console.log('Phone value length:', formData.phone ? formData.phone.length : 'NULL/UNDEFINED');
+                console.log('Phone value type:', typeof formData.phone);
+
                 // Prepare data for Google Sheets
                 const sheetsData = {
                     Name: formData.name,
@@ -368,6 +405,11 @@ END:VCALENDAR`;
                     Message: formData.message || 'No message',
                     'Submission Time': formData.timestamp
                 };
+
+                console.log('=== SHEETS DATA ===');
+                console.log('Complete sheets data:', sheetsData);
+                console.log('Sheets Phone field:', sheetsData.Phone);
+                console.log('JSON string being sent:', JSON.stringify(sheetsData));
 
                 // Submit to Google Sheets
                 submitToGoogleSheets(sheetsData).then(success => {
@@ -380,10 +422,14 @@ END:VCALENDAR`;
                     submitBtn.textContent = originalText;
                     submitBtn.disabled = false;
 
-                    // Show thank you message with confetti
+                    // Show thank you message
                     rsvpForm.classList.add('hidden');
                     thankYou.classList.remove('hidden');
-                    createConfetti();
+                    
+                    // Only show confetti if guest is attending
+                    if (formData.attendance === 'yes') {
+                        createConfetti();
+                    }
                     
                     // Scroll to top
                     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -398,22 +444,44 @@ END:VCALENDAR`;
 
             // Confetti animation
             function createConfetti() {
-                const colors = ['#d1d5db', '#9ca3af', '#6b7280', '#f3f4f6', '#e5e7eb', '#374151'];
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
+                const shapes = ['confetti-rect', 'confetti-circle', 'confetti-triangle'];
                 
-                for (let i = 0; i < 40; i++) {
+                for (let i = 0; i < 80; i++) {
                     setTimeout(() => {
                         const confetti = document.createElement('div');
-                        confetti.className = 'confetti';
-                        confetti.style.left = Math.random() * 100 + 'vw';
-                        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                        confetti.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                        const color = colors[Math.floor(Math.random() * colors.length)];
+                        
+                        confetti.className = `confetti ${shape}`;
+                        
+                        // Random starting position across the top
+                        const startX = Math.random() * 100;
+                        confetti.style.left = startX + 'vw';
+                        confetti.style.top = '-20px';
+                        
+                        // Random horizontal drift
+                        const randomDrift = (Math.random() - 0.5) * 200; // -100px to +100px drift
+                        confetti.style.setProperty('--random-x', randomDrift + 'px');
+                        
+                        // Random fall duration and delay
+                        confetti.style.animationDuration = `${Math.random() * 2 + 3}s`;
                         confetti.style.animationDelay = Math.random() * 1 + 's';
+                        
+                        if (shape === 'confetti-triangle') {
+                            confetti.style.borderBottomColor = color;
+                        } else {
+                            confetti.style.backgroundColor = color;
+                        }
+                        
                         document.body.appendChild(confetti);
                         
                         setTimeout(() => {
-                            confetti.remove();
-                        }, 6000);
-                    }, i * 60);
+                            if (confetti.parentNode) {
+                                confetti.remove();
+                            }
+                        }, 8000);
+                    }, i * 30);
                 }
             }
 
@@ -434,9 +502,5 @@ END:VCALENDAR`;
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987ceb57c74dd4de',t:'MTc1OTMzMTc2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'988e190482bd3c47',t:'MTc1OTUxMTg5Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
-
-
-
-
