@@ -68,10 +68,6 @@
             animation: fadeInUp 0.8s ease-out;
         }
         
-        .clean-bg {
-            background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
-        }
-        
         .elegant-shadow {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
@@ -108,6 +104,8 @@
         .form-card {
             background: #ffffff;
             border: 1px solid #e5e7eb;
+            position: relative;
+            z-index: 2;
         }
         
         .calendar-btn {
@@ -130,9 +128,82 @@
         .show {
             display: block !important;
         }
+
+        /* Paper background effect */
+        .paper {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+        }
+        
+        .paper::before,
+        .paper::after {
+          content: '';
+          position: absolute;
+          top: 0; right: 0; bottom: 0; left: 0;
+          background: 
+            linear-gradient(123deg, #000 23%, #fff 35%),
+            linear-gradient(45deg, #000 67%, #fff 89%),
+            linear-gradient(87deg, #000 12%, #fff 28%),
+            linear-gradient(156deg, #000 45%, #fff 61%),
+            linear-gradient(98deg, #000 34%, #fff 52%),
+            linear-gradient(178deg, #000 56%, #fff 74%),
+            linear-gradient(67deg, #000 78%, #fff 92%),
+            linear-gradient(134deg, #000 8%, #fff 24%),
+            linear-gradient(102deg, #000 41%, #fff 59%),
+            linear-gradient(167deg, #000 29%, #fff 47%),
+            linear-gradient(76deg, #000 63%, #fff 81%),
+            linear-gradient(145deg, #000 17%, #fff 33%),
+            linear-gradient(112deg, #000 52%, #fff 70%),
+            linear-gradient(189deg, #000 38%, #fff 56%),
+            linear-gradient(54deg, #000 71%, #fff 87%),
+            linear-gradient(129deg, #000 4%, #fff 22%),
+            linear-gradient(93deg, #000 49%, #fff 65%),
+            linear-gradient(172deg, #000 32%, #fff 50%),
+            linear-gradient(81deg, #000 68%, #fff 84%),
+            linear-gradient(151deg, #000 21%, #fff 37%),
+            linear-gradient(118deg, #000 58%, #fff 76%),
+            linear-gradient(194deg, #000 43%, #fff 61%),
+            linear-gradient(62deg, #000 75%, #fff 91%),
+            linear-gradient(137deg, #000 10%, #fff 26%),
+            linear-gradient(105deg, #000 55%, #fff 73%),
+            linear-gradient(176deg, #000 35%, #fff 53%),
+            linear-gradient(86deg, #000 72%, #fff 88%),
+            linear-gradient(159deg, #000 25%, #fff 41%),
+            linear-gradient(124deg, #000 62%, #fff 80%),
+            linear-gradient(199deg, #000 47%, #fff 65%),
+            linear-gradient(70deg, #000 79%, #fff 95%),
+            linear-gradient(142deg, #000 14%, #fff 30%),
+            linear-gradient(109deg, #000 59%, #fff 77%),
+            linear-gradient(181deg, #000 39%, #fff 57%),
+            linear-gradient(91deg, #000 76%, #fff 92%),
+            linear-gradient(164deg, #000 28%, #fff 44%),
+            linear-gradient(131deg, #000 65%, #fff 83%),
+            linear-gradient(204deg, #000 51%, #fff 69%),
+            linear-gradient(78deg, #000 83%, #fff 99%);
+          background-blend-mode: difference;
+        }
+        
+        .paper::after {
+          filter: invert(1);
+          opacity: 0.5;
+          top: 1px;
+        }
+        
+        .color-overlay {
+          background: hsla(40, 90, 70, 0.5);
+          mix-blend-mode: overlay;
+          position: absolute;
+          top: 0; left: 0; bottom: 0; right: 0;
+          z-index: 1;
+        }
     </style>
 </head>
-<body class="clean-bg min-h-screen py-12 px-4">
+<body class="min-h-screen py-12 px-4">
+    <div class="paper"><div class="color-overlay"></div></div>
     <div class="max-w-lg mx-auto relative z-10">
         <!-- Header -->
         <div class="text-center mb-12 fade-in-up">
@@ -267,7 +338,6 @@
             const attendanceRadios = document.querySelectorAll('input[name="attendance"]');
             const plusOneSection = document.getElementById('plusOneSection');
             const plusOneSelect = document.getElementById('plusOnes');
-            const plusOneNames = document.getElementById('plusOneNames');
             const calendarSection = document.getElementById('calendarSection');
             const rsvpForm = document.getElementById('rsvp-form');
             const thankYou = document.getElementById('thank-you');
@@ -294,8 +364,6 @@
                         plusOneSection.classList.remove('show');
                         calendarSection.classList.add('hidden');
                         calendarSection.classList.remove('show');
-                        plusOneNames.classList.add('hidden');
-                        plusOneNames.classList.remove('show');
                         console.log('Hiding sections');
                     }
                 });
@@ -410,107 +478,4 @@ END:VCALENDAR`;
                 const sheetsData = {
                     Name: formData.name,
                     Phone: formData.phone,
-                    Attendance: formData.attendance === 'yes' ? 'Yes' : 'No',
-                    'Number of Guests': formData.attendance === 'yes' ? parseInt(formData.plusOnes) : 0,
-                    Message: formData.message || 'No message',
-                    'Submission Time': formData.timestamp
-                };
-
-                console.log('=== SHEETS DATA ===');
-                console.log('Complete sheets data:', sheetsData);
-                console.log('Sheets Phone field:', sheetsData.Phone);
-                console.log('JSON string being sent:', JSON.stringify(sheetsData));
-
-                // Submit to Google Sheets
-                submitToGoogleSheets(sheetsData).then(success => {
-                    // Also store locally as backup
-                    const existingRSVPs = JSON.parse(localStorage.getItem('weddingRSVPs') || '[]');
-                    existingRSVPs.push(formData);
-                    localStorage.setItem('weddingRSVPs', JSON.stringify(existingRSVPs));
-
-                    // Reset button
-                    submitBtn.textContent = originalText;
-                    submitBtn.disabled = false;
-
-                    // Show thank you message
-                    rsvpForm.classList.add('hidden');
-                    thankYou.classList.remove('hidden');
-                    
-                    // Only show confetti if guest is attending
-                    if (formData.attendance === 'yes') {
-                        createConfetti();
-                    }
-                    
-                    // Scroll to top
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-                    if (success) {
-                        console.log('RSVP successfully saved to Google Sheets');
-                    } else {
-                        console.log('RSVP saved locally (Google Sheets connection failed)');
-                    }
-                });
-            });
-
-            // Confetti animation
-            function createConfetti() {
-                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
-                const shapes = ['confetti-rect', 'confetti-circle', 'confetti-triangle'];
-                
-                for (let i = 0; i < 80; i++) {
-                    setTimeout(() => {
-                        const confetti = document.createElement('div');
-                        const shape = shapes[Math.floor(Math.random() * shapes.length)];
-                        const color = colors[Math.floor(Math.random() * colors.length)];
-                        
-                        confetti.className = `confetti ${shape}`;
-                        
-                        // Random starting position across the top
-                        const startX = Math.random() * 100;
-                        confetti.style.left = startX + 'vw';
-                        confetti.style.top = '-20px';
-                        
-                        // Random horizontal drift
-                        const randomDrift = (Math.random() - 0.5) * 200; // -100px to +100px drift
-                        confetti.style.setProperty('--random-x', randomDrift + 'px');
-                        
-                        // Random fall duration and delay
-                        confetti.style.animationDuration = `${Math.random() * 2 + 3}s`;
-                        confetti.style.animationDelay = Math.random() * 1 + 's';
-                        
-                        if (shape === 'confetti-triangle') {
-                            confetti.style.borderBottomColor = color;
-                        } else {
-                            confetti.style.backgroundColor = color;
-                        }
-                        
-                        document.body.appendChild(confetti);
-                        
-                        setTimeout(() => {
-                            if (confetti.parentNode) {
-                                confetti.remove();
-                            }
-                        }, 8000);
-                    }, i * 30);
-                }
-            }
-
-            // Function to show form again
-            window.showForm = function() {
-                thankYou.classList.add('hidden');
-                rsvpForm.classList.remove('hidden');
-                form.reset();
-                plusOneSection.classList.add('hidden');
-                calendarSection.classList.add('hidden');
-            }
-
-            // Demo function to view stored RSVPs (for testing)
-            window.viewStoredRSVPs = function() {
-                const rsvps = JSON.parse(localStorage.getItem('weddingRSVPs') || '[]');
-                console.log('All stored RSVPs:', rsvps);
-                return rsvps;
-            }
-        });
-    </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'988e70b3b3593c47',t:'MTc1OTUxNTQ4Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-</html>
+                    Attendance: formData.attendance ===
